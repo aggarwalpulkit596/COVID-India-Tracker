@@ -26,13 +26,15 @@
         android:textAllCaps="true"
         android:textColor="@color/dark_red"
         android:textStyle="bold" />
+
     <TextView
-        android:textAlignment="center"
-        android:layout_weight="1"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:fontFamily="@font/coming_soon"
         android:padding="8dp"
         android:text="ACTV"
+        android:textAlignment="center"
         android:textAllCaps="true"
         android:textColor="@color/dark_blue"
         android:textStyle="bold" />
