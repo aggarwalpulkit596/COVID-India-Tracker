@@ -13,4 +13,5 @@
     <color name="dark_green">#388E3C</color>
     <color name="dark_blue">#1976D2</color>
     <color name="dark_yellow">#FBC02D</color>
+    <color name="ic_launcher_background">#FFFFFF</color>
 </resources>
