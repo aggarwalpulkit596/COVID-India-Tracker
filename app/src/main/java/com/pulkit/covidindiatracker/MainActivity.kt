@@ -20,24 +20,30 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        list.addHeaderView(LayoutInflater.from(this).inflate(R.layout.list_header,list,false))
 
+        fetchResults()
+        swipeToRefresh.setOnRefreshListener {
+            fetchResults()
+        }
+    }
+
+    private fun fetchResults() {
         GlobalScope.launch {
-            val response = withContext(Dispatchers.IO) { Client.api.execute() }
+            val response = withContext(Dispatchers.IO) { Client.api.clone().execute() }
             if (response.isSuccessful) {
+                swipeToRefresh.isRefreshing = false
                 val data = Gson().fromJson(response.body?.string(), Response::class.java)
                 launch(Dispatchers.Main) {
                     bindCombinedData(data.statewise[0])
                     bindStateWiseData(data.statewise.subList(0,data.statewise.size))
                 }
-
             }
-
         }
     }
 
     private fun bindStateWiseData(subList: List<StatewiseItem>) {
         stateListAdapter = StateListAdapter(subList)
-        list.addHeaderView(LayoutInflater.from(this).inflate(R.layout.list_header,list,false))
         list.adapter = stateListAdapter
     }
 
