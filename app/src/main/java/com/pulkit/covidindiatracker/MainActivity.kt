@@ -2,6 +2,7 @@ package com.pulkit.covidindiatracker
 
 import android.os.Bundle
 import android.view.LayoutInflater
+import android.widget.AbsListView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.work.*
 import com.google.gson.Gson
@@ -10,6 +11,7 @@ import kotlinx.coroutines.*
 import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.TimeUnit
+
 
 class MainActivity : AppCompatActivity() {
 
@@ -26,7 +28,21 @@ class MainActivity : AppCompatActivity() {
             fetchResults()
         }
         initWorker()
-
+        list.setOnScrollListener(object : AbsListView.OnScrollListener {
+            override fun onScrollStateChanged(view: AbsListView, scrollState: Int) {}
+            override fun onScroll(
+                view: AbsListView,
+                firstVisibleItem: Int,
+                visibleItemCount: Int,
+                totalItemCount: Int
+            ) {
+                if (list.getChildAt(0) != null) {
+                    swipeToRefresh.isEnabled = list.firstVisiblePosition === 0 && list.getChildAt(
+                        0
+                    ).getTop() === 0
+                }
+            }
+        })
     }
 
     private fun fetchResults() {
