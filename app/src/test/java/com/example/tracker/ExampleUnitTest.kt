@@ -1,4 +1,4 @@
-package com.pulkit.covidindiatracker
+package com.example.tracker
 
 import org.junit.Test
 

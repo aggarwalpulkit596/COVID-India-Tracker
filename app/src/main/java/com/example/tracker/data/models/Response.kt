@@ -1,7 +1,7 @@
-package com.pulkit.covidindiatracker
+package com.example.tracker.data.models
 
-data class Response(
-	val statewise: List<StatewiseItem>
+data class response(
+	val statewise: ArrayList<StatewiseItem>
 )
 
 data class StatewiseItem(
