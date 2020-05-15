@@ -1,4 +1,4 @@
-package com.pulkit.covidindiatracker
+package com.example.tracker.ui.adapter
 
 import android.graphics.Color
 import android.text.Spannable

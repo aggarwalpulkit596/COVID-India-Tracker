@@ -1,4 +1,4 @@
-package com.pulkit.covidindiatracker
+package com.example.tracker.ui.view
 
 import android.annotation.SuppressLint
 import android.app.NotificationChannel
@@ -12,9 +12,12 @@ import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
-import com.google.gson.Gson
+import com.example.tracker.R
+import com.example.tracker.data.api.Client
 import kotlinx.coroutines.*
 import java.text.SimpleDateFormat
+import java.util.*
+import java.util.concurrent.TimeUnit
 
 @ExperimentalCoroutinesApi
 @InternalCoroutinesApi
@@ -61,25 +64,56 @@ class NotificationWorker(
         notificationManager.notify(0, notificationBuilder.build())
     }
 
-    override suspend fun doWork(): Result = coroutineScope {
-        val response = withContext(Dispatchers.IO) { Client.api.clone().execute() }
-        if (response.isSuccessful) {
-            val result = Gson().fromJson(response.body?.string(), Response::class.java)
-            val totalDetails = result.statewise[0]
+    override suspend fun doWork(): Result {
+        lateinit var result: Result
+        GlobalScope.launch(Dispatchers.Main) {
 
-            showNotification(
-                totalDetails.confirmed ?: "",
-                getTimeAgo(
-                    SimpleDateFormat("dd/MM/yyyy HH:mm:ss")
-                        .parse(totalDetails.lastupdatedtime)
+            val res = withContext(Dispatchers.IO) {
+
+                Client.api.getStates()
+            }
+            if (res.isSuccessful) {
+                val totalDetails = res.body()!!.statewise[0]
+
+                showNotification(
+                    totalDetails.confirmed ?: "",
+                    getTimeAgo(
+                        SimpleDateFormat("dd/MM/yyyy HH:mm:ss")
+                            .parse(totalDetails.lastupdatedtime)
+                    )
                 )
-            )
 
-            Result.success()
-        } else {
-            Result.retry()
+                result = Result.success()
+            } else {
+                result = Result.retry()
+            }
+
+        }
+        return result
+    }
+
+    fun getTimeAgo(past: Date): String {
+        val now = Date()
+        val seconds = TimeUnit.MILLISECONDS.toSeconds(now.time - past.time)
+        val minutes = TimeUnit.MILLISECONDS.toMinutes(now.time - past.time)
+        val hours = TimeUnit.MILLISECONDS.toHours(now.time - past.time)
+
+        return when {
+            seconds < 60 -> {
+                "Few seconds ago"
+            }
+            minutes < 60 -> {
+                "$minutes minutes ago"
+            }
+            hours < 24 -> {
+                "$hours hour ${minutes % 60} min ago"
+            }
+            else -> {
+                SimpleDateFormat("dd/MM/yy, hh:mm a").format(past).toString()
+
+            }
         }
 
-
     }
+
 }
